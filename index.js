@@ -3,7 +3,7 @@ const canvasEl = document.querySelector("canvas"),
   canvasCtx = canvasEl.getContext("2d"),
   gapX = 10;
 
-const lineWidth = 15;
+const mouse = { x: 0, y: 0 };
 
 // cria o campo
 const field = {
@@ -29,12 +29,17 @@ const line = {
 // cria a raquete esquerda
 const leftPaddle = {
   x: gapX,
-  y: 100,
+  y: 0,
   w: line.w,
-  h: 140,
+  h: 130,
+  _move: function () {
+    this.y = mouse.y - this.h / 2;
+  },
   draw: function () {
     canvasCtx.fillStyle = "#ffffff";
     canvasCtx.fillRect(this.x, this.y, this.w, this.h);
+
+    this._move();
   },
 };
 
@@ -43,10 +48,15 @@ const rightPaddle = {
   x: field.w - line.w - gapX,
   y: 100,
   w: line.w,
-  h: 140,
+  h: 230,
+  _move: function () {
+    this.y = ball.y;
+  },
   draw: function () {
     canvasCtx.fillStyle = "#ffffff";
     canvasCtx.fillRect(this.x, this.y, this.w, this.h);
+
+    this._move();
   },
 };
 
@@ -69,11 +79,18 @@ const ball = {
   x: 170,
   y: 100,
   r: 12,
+  speed: 5,
+  _move: function () {
+    this.x += 1 * this.speed;
+    this.y += 1;
+  },
   draw: function () {
     canvasCtx.fillStyle = "#ffffff";
     canvasCtx.beginPath();
     canvasCtx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
     canvasCtx.fill();
+
+    this._move();
   },
 };
 
@@ -92,5 +109,28 @@ function draw() {
   ball.draw();
 }
 
+window.animateFrame = (function () {
+  return (
+    window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    function (callback) {
+      return window.setTimeout(callback, 1000 / 60);
+    }
+  );
+})();
+
+function main() {
+  animateFrame(main);
+  draw();
+}
+
 setup();
-draw();
+main();
+
+canvasEl.addEventListener("mousemove", function (e) {
+  mouse.x = e.pageX;
+  mouse.y = e.pageY;
+});
