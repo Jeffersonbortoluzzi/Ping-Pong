@@ -48,7 +48,7 @@ const rightPaddle = {
   x: field.w - line.w - gapX,
   y: 100,
   w: line.w,
-  h: 230,
+  h: 130,
   _move: function () {
     this.y = ball.y;
   },
@@ -76,13 +76,34 @@ const score = {
 
 // cria bolinha
 const ball = {
-  x: 170,
-  y: 100,
+  x: 0,
+  y: 0,
   r: 12,
-  speed: 5,
+  speed: 3,
+  diretcionX: 1,
+  diretcionY: 1,
+  _calcPosition: function () {
+    // verifica as laterais superior e inferior do campo
+    if (
+      (this.y - this.r < 0 && this.diretcionY < 0) ||
+      (this.y > field.h - this.r && this.diretcionY > 0)
+    ) {
+      // rebate a bola invertendo o sinal do eixo Y  
+      this._reverseY();
+    }
+  },
+  _reverseX: function () {
+    this.diretcionX *= -1;
+  },
+  _reverseY: function () {
+    // 1 * -1 = -1
+    // -1 * -1 = 1
+    this.diretcionY *= -1;
+  },
+
   _move: function () {
-    this.x += 1 * this.speed;
-    this.y += 1;
+    this.x += this.diretcionX * this.speed;
+    this.y += this.diretcionY * this.speed;
   },
   draw: function () {
     canvasCtx.fillStyle = "#ffffff";
@@ -90,6 +111,7 @@ const ball = {
     canvasCtx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
     canvasCtx.fill();
 
+    this._calcPosition();
     this._move();
   },
 };
