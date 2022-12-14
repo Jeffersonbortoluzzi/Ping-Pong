@@ -1,50 +1,95 @@
 // criar canvas
 const canvasEl = document.querySelector("canvas"),
-  canvasCtx = canvasEl.getContext("2d");
+  canvasCtx = canvasEl.getContext("2d"),
+  gapX = 10;
 
 const lineWidth = 15;
 
+// cria o campo
+const field = {
+  w: window.innerWidth,
+  h: window.innerHeight,
+  draw: function () {
+    // fillRect(eixoX, eixoY Largura, Altura)
+    canvasCtx.fillStyle = "#286047";
+    canvasCtx.fillRect(0, 0, this.w, this.h);
+  },
+};
+
+// cria a linha central
+const line = {
+  w: 15,
+  h: field.h,
+  draw: function () {
+    canvasCtx.fillStyle = "#ffffff";
+    canvasCtx.fillRect(field.w / 2 - this.w / 2, 0, this.w, this.h);
+  },
+};
+
+// cria a raquete esquerda
+const leftPaddle = {
+  x: gapX,
+  y: 100,
+  w: line.w,
+  h: 140,
+  draw: function () {
+    canvasCtx.fillStyle = "#ffffff";
+    canvasCtx.fillRect(this.x, this.y, this.w, this.h);
+  },
+};
+
+// cria a raquete direita
+const rightPaddle = {
+  x: field.w - line.w - gapX,
+  y: 100,
+  w: line.w,
+  h: 140,
+  draw: function () {
+    canvasCtx.fillStyle = "#ffffff";
+    canvasCtx.fillRect(this.x, this.y, this.w, this.h);
+  },
+};
+
+// placar
+const score = {
+  human: 1,
+  computer: 2,
+  draw: function () {
+    canvasCtx.font = "bold 72px Arial";
+    canvasCtx.textAlign = "center";
+    canvasCtx.textBaseline = "top";
+    canvasCtx.fillStyle = "#01341d";
+    canvasCtx.fillText(this.human, field.w / 4, 50);
+    canvasCtx.fillText(this.computer, field.w / 4 + field.w / 2, 50);
+  },
+};
+
+// cria bolinha
+const ball = {
+  x: 170,
+  y: 100,
+  r: 12,
+  draw: function () {
+    canvasCtx.fillStyle = "#ffffff";
+    canvasCtx.beginPath();
+    canvasCtx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+    canvasCtx.fill();
+  },
+};
+
 function setup() {
   //define largura da tela (window) captura a largura
-  canvasEl.width = canvasCtx.width = window.innerWidth;
-  canvasEl.height = canvasCtx.height = window.innerHeight;
+  canvasEl.width = canvasCtx.width = field.w;
+  canvasEl.height = canvasCtx.height = field.h;
 }
 
 function draw() {
-  // fillRect(eixoX, eixoY Largura, Altura)
-
-  // cria o campo
-  canvasCtx.fillStyle = "#286047";
-  canvasCtx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-
-  // cria a linha central
-  canvasCtx.fillStyle = "#ffffff";
-
-  const x = window.innerWidth / 2 - lineWidth / 2;
-  const y = 0;
-  const w = lineWidth;
-  const h = window.innerHeight;
-
-  canvasCtx.fillRect(x, y, w, h);
-
-  // cria a raquete esquerda
-  canvasCtx.fillRect(10, 350, lineWidth, 150);
-
-  // cria a raquete direita
-  canvasCtx.fillRect(window.innerWidth - lineWidth - 10, 350, lineWidth, 150);
-
-  // cria bolinha
-  canvasCtx.beginPath();
-  canvasCtx.arc(200, 300, 12, 0, 2 * Math.PI);
-  canvasCtx.fill();
-
-  // desenho placar
-  canvasCtx.font = "bold 72px Arial";
-  canvasCtx.textAlign = "center";
-  canvasCtx.textBaseline = "top";
-  canvasCtx.fillStyle = "#01341d";
-  canvasCtx.fillText("3", window.innerWidth / 4, 50);
-  canvasCtx.fillText("2", window.innerWidth / 4 + window.innerWidth / 2, 50);
+  field.draw();
+  line.draw();
+  leftPaddle.draw();
+  rightPaddle.draw();
+  score.draw();
+  ball.draw();
 }
 
 setup();
