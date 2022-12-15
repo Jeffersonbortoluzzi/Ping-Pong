@@ -1,22 +1,18 @@
-// criar canvas
 const canvasEl = document.querySelector("canvas"),
   canvasCtx = canvasEl.getContext("2d"),
   gapX = 10;
 
 const mouse = { x: 0, y: 0 };
 
-// cria o campo
 const field = {
   w: window.innerWidth,
   h: window.innerHeight,
   draw: function () {
-    // fillRect(eixoX, eixoY Largura, Altura)
     canvasCtx.fillStyle = "#286047";
     canvasCtx.fillRect(0, 0, this.w, this.h);
   },
 };
 
-// cria a linha central
 const line = {
   w: 15,
   h: field.h,
@@ -26,7 +22,6 @@ const line = {
   },
 };
 
-// cria a raquete esquerda
 const leftPaddle = {
   x: gapX,
   y: 0,
@@ -43,28 +38,33 @@ const leftPaddle = {
   },
 };
 
-// cria a raquete direita
 const rightPaddle = {
   x: field.w - line.w - gapX,
-  y: 100,
+  y: 0,
   w: line.w,
   h: 130,
+  speed: 4,
   _move: function () {
-    this.y = ball.y;
+    if (this.y + this.h / 2 < ball.y + ball.r) {
+      this.y += this.speed;
+    } else {
+      this.y -= this.speed;
+    }
+  },
+  speedUp: function () {
+    this.speed += 0.2; // velocidade raquete
   },
   draw: function () {
     canvasCtx.fillStyle = "#ffffff";
     canvasCtx.fillRect(this.x, this.y, this.w, this.h);
-
     this._move();
   },
 };
 
-// placar
 const score = {
   human: 0,
   computer: 0,
-  pointPlayer: function () {
+  pointHuman: function () {
     this.human++;
   },
   pointComputer: function () {
@@ -80,12 +80,11 @@ const score = {
   },
 };
 
-// cria bolinha
 const ball = {
-  x: 0,
-  y: 0,
-  r: 15,
-  speed: 5,
+  x: field.w / 2,
+  y: field.h / 2,
+  r: 20,
+  speed: 4,
   directionX: 1,
   directionY: 1,
   _calcPosition: function () {
@@ -100,19 +99,19 @@ const ball = {
         this._reverseX();
       } else {
         // pontuar o jogador 1
-        score.pointPlayer();
+        score.pointHuman();
         this._pointUp();
       }
     }
 
     // verifica se o jogador 2 fez um ponto (x < 0)
     if (this.x < this.r + leftPaddle.w + gapX) {
-      // verifica se a raquete esquerda está na posição Y bola
+      // verifica se a raquete esquerda está na posição y da bola
       if (
-        this.y > leftPaddle.y &&
+        this.y + this.r > leftPaddle.y &&
         this.y - this.r < leftPaddle.y + leftPaddle.h
       ) {
-        // rebate a bola invertendo o sinal de X
+        // rebate a bola intervertendo o sinal de X
         this._reverseX();
       } else {
         // pontuar o jogador 2
@@ -140,7 +139,13 @@ const ball = {
     // -1 * -1 = 1
     this.directionY *= -1;
   },
+  _speedUp: function () {
+    this.speed += 0.5;
+  },
   _pointUp: function () {
+    this._speedUp();
+    rightPaddle.speedUp();
+
     this.x = field.w / 2;
     this.y = field.h / 2;
   },
@@ -160,7 +165,6 @@ const ball = {
 };
 
 function setup() {
-  //define largura da tela (window) captura a largura
   canvasEl.width = canvasCtx.width = field.w;
   canvasEl.height = canvasCtx.height = field.h;
 }
@@ -168,9 +172,12 @@ function setup() {
 function draw() {
   field.draw();
   line.draw();
+
   leftPaddle.draw();
   rightPaddle.draw();
+
   score.draw();
+
   ball.draw();
 }
 
